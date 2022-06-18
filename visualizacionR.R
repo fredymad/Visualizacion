@@ -283,3 +283,41 @@ fig <- plot_ly(x=colnames(correlacion), y=colnames(correlacion), z = as.matrix(c
 fig
 
 write.table(correlacion, file = "correlacion.txt", sep = "\t", row.names = FALSE)
+
+
+# Tiendas con mayor crecimiento
+tiendas <- union %>%
+  mutate(ano = year(Date)) %>%
+  select(Store, ano, Weekly_Sales)%>%
+  group_by(Store, ano) %>%
+  mutate_all(sum) %>%
+  distinct()
+
+tiendas2 <- tiendas %>%
+  group_by(Store) %>%
+  arrange(Store) %>%
+  mutate(variacion = Weekly_Sales - lag(Weekly_Sales),
+         variacionTotal = sum(variacion, na.rm = T)) #%>%
+ # filter(!is.na(variacion))
+tiendas2 <- round(tiendas2, digits = 2)
+
+write.table(tiendas2, file = "variacionTiendas.txt", row.names = F, sep = "\t")
+
+# Departamentos con mayor crecimiento
+
+departamentos <- union %>%
+  mutate(ano = year(Date)) %>%
+  select(Dept, ano, Weekly_Sales)%>%
+  group_by(Dept, ano) %>%
+  mutate_all(sum) %>%
+  distinct()
+
+departamentos2 <- departamentos %>%
+  group_by(Dept) %>%
+  arrange(Dept) %>%
+  mutate(variacion = Weekly_Sales - lag(Weekly_Sales),
+         variacionTotal = sum(variacion, na.rm = T)) #%>%
+# filter(!is.na(variacion))
+departamentos2 <- round(departamentos2, digits = 2)
+
+write.table(departamentos2, file = "variacionDepartamentos.txt", row.names = F, sep = "\t")
